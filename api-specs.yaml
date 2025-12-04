@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: Workflow API with Vector Search
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /health:
+    get:
+      summary: 健康检查
+      responses:
+        '200':
+          description: 服务健康
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+
+  /workflows:
+    post:
+      summary: 创建工作流（仅名称）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowCreate'
+      responses:
+        '200':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+    get:
+      summary: 获取工作流列表
+      responses:
+        '200':
+          description: 工作流列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workflow'
+
+  /workflows/{id}:
+    get:
+      summary: 获取单个工作流
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 单个工作流
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+
+  /search:
+    post:
+      summary: 向量相似搜索（模拟）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query_vector:
+                  type: array
+                  items:
+                    type: number
+                  example: [0.1, 0.2, 0.3, 0.4]
+                limit:
+                  type: integer
+                  default: 5
+      responses:
+        '200':
+          description: 相似结果列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    content:
+                      type: string
+                    distance:
+                      type: number
+
+components:
+  schemas:
+    WorkflowCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+      required: [name]
+
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+      required: [id, name]
